@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const ItemDetails = () => {
+const ItemDetails = ({ onAddToCart, onBuyNow }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const item = location.state?.item;
   
   const [selectedImage, setSelectedImage] = useState(item?.images[0] || '');
@@ -12,17 +13,12 @@ const ItemDetails = () => {
     return <div>Loading...</div>;
   }
 
-  const handleBuyNow = (item) => {
-    navigate('/checkout', { state: { item } });
+  const handleBuyNow = () => {
+    navigate('/checkout', { state: { item, quantity } });
   };
 
-  const addToCart = (item, quantity) => {
-    setCartItems([...cartItems, { ...item, quantity }]);
-    fetch('/api/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: item.id, quantity }),
-    });
+  const addToCart = () => {
+    onAddToCart(item, quantity);
   };
   
 
@@ -51,10 +47,10 @@ const ItemDetails = () => {
         onChange={(e) => setQuantity(Number(e.target.value))}
         className="border rounded p-2 w-16 mt-2"
       />
-      <button onClick={() => addToCart(item, quantity)} className="bg-green-700 text-white px-4 py-2 rounded mt-2">
+      <button onClick={addToCart} className="bg-green-700 text-white px-4 py-2 rounded mt-2">
         Add to Cart
       </button>
-      <button onClick={() => handleBuyNow(item)} className="bg-blue-600 text-white px-4 py-2 rounded mt-2 ml-2">
+      <button onClick={handleBuyNow} className="bg-blue-600 text-white px-4 py-2 rounded mt-2 ml-2">
         Buy Now
       </button>
     </div>
