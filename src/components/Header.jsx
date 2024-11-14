@@ -30,8 +30,8 @@ const Header = ({ cartTotal }) => {
         {/* Navigation Links */}
         <nav
           className={`${
-            isMenuOpen ? 'block' : 'hidden'
-          } md:flex items-center space-y-4 md:space-y-0 md:space-x-6 mt-4 md:mt-0 w-full md:w-auto md:static absolute left-0 top-full md:top-auto bg-green-800 md:bg-transparent z-10 px-6 md:px-0`}
+            isMenuOpen ? 'flex' : 'hidden'
+          } flex-col md:flex md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 mt-4 md:mt-0 w-full md:w-auto md:static fixed top-16 left-0 bg-green-800 md:bg-transparent z-10 px-6 md:px-0`}
         >
           <Link
             to="/myaccount"
