@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const ItemDetails = ({ onAddToCart, onBuyNow }) => {
+const ItemDetails = () => {
   const location = useLocation();
   const item = location.state?.item;
   
@@ -11,6 +11,20 @@ const ItemDetails = ({ onAddToCart, onBuyNow }) => {
   if (!item) {
     return <div>Loading...</div>;
   }
+
+  const handleBuyNow = (item) => {
+    navigate('/checkout', { state: { item } });
+  };
+
+  const addToCart = (item, quantity) => {
+    setCartItems([...cartItems, { ...item, quantity }]);
+    fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: item.id, quantity }),
+    });
+  };
+  
 
   return (
     <div className="p-4">
@@ -37,10 +51,10 @@ const ItemDetails = ({ onAddToCart, onBuyNow }) => {
         onChange={(e) => setQuantity(Number(e.target.value))}
         className="border rounded p-2 w-16 mt-2"
       />
-      <button onClick={() => onAddToCart(item, quantity)} className="bg-green-700 text-white px-4 py-2 rounded mt-2">
+      <button onClick={() => addToCart(item, quantity)} className="bg-green-700 text-white px-4 py-2 rounded mt-2">
         Add to Cart
       </button>
-      <button onClick={() => onBuyNow(item)} className="bg-blue-600 text-white px-4 py-2 rounded mt-2 ml-2">
+      <button onClick={() => handleBuyNow(item)} className="bg-blue-600 text-white px-4 py-2 rounded mt-2 ml-2">
         Buy Now
       </button>
     </div>
