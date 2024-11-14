@@ -46,7 +46,6 @@ const Home = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Navbar cartTotal={cartItems.reduce((total, item) => total + item.price * item.quantity, 0)} />
       <div className="container mx-auto p-4 flex">
         <aside className="w-1/4 pr-4">
           <CategoryFilter categories={['Tractors', 'Equipment']} setSelectedCategory={setSelectedCategory} />
