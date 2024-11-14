@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Offers = ({ offers, onOfferSelect }) => (
+const Offers = ({ offers, onOfferSelect, setIsOfferOpen }) => (
   <section className="bg-green-50 p-4 rounded-lg shadow-md mb-6">
     <h2 className="text-xl font-bold mb-4 text-green-800">Special Offers</h2>
     <div className="grid grid-cols-1 gap-4">
@@ -9,7 +9,7 @@ const Offers = ({ offers, onOfferSelect }) => (
           key={offer.id} 
           onClick={() => {
             onOfferSelect(offer);
-            setIsOfferOpen(false); // Close sidebar after selecting offer
+            setIsOfferOpen(false);
           }}
           className="bg-white p-4 shadow-lg rounded-lg cursor-pointer"
         >
