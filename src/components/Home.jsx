@@ -73,6 +73,25 @@ const Home = () => {
         {/* Sidebar: Category Filter */}
         <aside className="w-full md:w-1/4 pr-4 md:block flex-none">
           <CategoryFilter categories={['Tractors', 'Equipment']} setSelectedCategory={setSelectedCategory} />
+          
+          {/* Items on Offer Section */}
+          <div className="bg-white shadow-md rounded-lg mt-4 p-4">
+            <h2 className="text-xl font-semibold mb-2">Items on Offer</h2>
+            <div className="space-y-4">
+              {items.map(item => (
+                <div key={item.id} className="flex justify-between items-center p-2 border-b">
+                  <div>
+                    <span className="text-lg font-medium">{item.name}</span>
+                    <div className="text-sm text-gray-600">{item.category}</div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-red-500 font-semibold">20% Off</span>
+                    <div className="text-xs text-gray-500">Black Friday Sale</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </aside>
 
         {/* Main Content Area: Item List or Item Details */}
