@@ -14,7 +14,7 @@ const Header = ({ cartTotal }) => {
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
           <FaTractor className="text-3xl text-yellow-400" />
           <h1 className="text-2xl md:text-3xl font-bold tracking-wide hover:text-yellow-300 transition">
-            Farmify Equipment
+            Farmify
           </h1>
         </div>
 
