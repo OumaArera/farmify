@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Checkout from './Checkout';
 import ItemList from './ItemList';
 import ItemDetails from './ItemDetails';
@@ -10,12 +10,12 @@ import Footer from './Footer';
 
 const Home = () => {
   const navigate = useNavigate();
-  
+
   const [items, setItems] = useState([
     { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
     { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
   ]);
-  
+
   const [cartItems, setCartItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +95,7 @@ const Home = () => {
         </aside>
 
         {/* Main Content Area: Item List or Item Details */}
-        <main className="w-full md:w-3/4 mt-4 md:mt-0">
+        <main className="w-full md:w-3/4 mt-4 md:mt-0 flex flex-col">
           <SearchBar onSearch={handleSearch} />
           {searchMessage && (
             <p className="text-red-500 text-center mt-4">{searchMessage}</p>
