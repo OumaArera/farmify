@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, useNavigate } from 'react-router-dom';
 import Checkout from './Checkout';
 import ItemList from './ItemList';
 import ItemDetails from './ItemDetails';
@@ -10,12 +10,12 @@ import Footer from './Footer';
 
 const Home = () => {
   const navigate = useNavigate();
-
+  
   const [items, setItems] = useState([
-    { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
-    { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
+    { id: 1, name: 'Tractor Model A',sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
+    { id: 2, name: 'Plow',sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
   ]);
-
+  
   const [cartItems, setCartItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,37 +65,16 @@ const Home = () => {
   const handleItemSelect = (item) => {
     setDetailedItem(item);
     navigate(`/items/${item.id}`, { state: { item } });
+
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto p-4 flex flex-col md:flex-row">
-        {/* Sidebar: Category Filter */}
-        <aside className="w-full md:w-1/4 pr-4 md:block flex-none">
+      <div className="container mx-auto p-4 flex">
+        <aside className="w-1/4 pr-4">
           <CategoryFilter categories={['Tractors', 'Equipment']} setSelectedCategory={setSelectedCategory} />
-          
-          {/* Items on Offer Section */}
-          <div className="bg-white shadow-md rounded-lg mt-4 p-4">
-            <h2 className="text-xl font-semibold mb-2">Items on Offer</h2>
-            <div className="space-y-4">
-              {items.map(item => (
-                <div key={item.id} className="flex justify-between items-center p-2 border-b">
-                  <div>
-                    <span className="text-lg font-medium">{item.name}</span>
-                    <div className="text-sm text-gray-600">{item.category}</div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-red-500 font-semibold">20% Off</span>
-                    <div className="text-xs text-gray-500">Black Friday Sale</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </aside>
-
-        {/* Main Content Area: Item List or Item Details */}
-        <main className="w-full md:w-3/4 mt-4 md:mt-0 flex flex-col">
+        <main className="w-3/4">
           <SearchBar onSearch={handleSearch} />
           {searchMessage && (
             <p className="text-red-500 text-center mt-4">{searchMessage}</p>
@@ -107,11 +86,7 @@ const Home = () => {
           )}
         </main>
       </div>
-
-      {/* Feedback Section */}
       <Feedback />
-      
-      {/* Footer Section */}
       <Footer />
     </div>
   );
