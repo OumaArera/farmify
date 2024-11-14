@@ -12,8 +12,8 @@ const Home = () => {
   const navigate = useNavigate();
   
   const [items, setItems] = useState([
-    { id: 1, name: 'Tractor Model A',sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
-    { id: 2, name: 'Plow',sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
+    { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
+    { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
   ]);
   
   const [cartItems, setCartItems] = useState([]);
@@ -65,16 +65,18 @@ const Home = () => {
   const handleItemSelect = (item) => {
     setDetailedItem(item);
     navigate(`/items/${item.id}`, { state: { item } });
-
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto p-4 flex">
-        <aside className="w-1/4 pr-4">
+      <div className="container mx-auto p-4 flex flex-col md:flex-row">
+        {/* Sidebar: Category Filter */}
+        <aside className="w-full md:w-1/4 pr-4 md:block flex-none">
           <CategoryFilter categories={['Tractors', 'Equipment']} setSelectedCategory={setSelectedCategory} />
         </aside>
-        <main className="w-3/4">
+
+        {/* Main Content Area: Item List or Item Details */}
+        <main className="w-full md:w-3/4 mt-4 md:mt-0">
           <SearchBar onSearch={handleSearch} />
           {searchMessage && (
             <p className="text-red-500 text-center mt-4">{searchMessage}</p>
@@ -86,7 +88,11 @@ const Home = () => {
           )}
         </main>
       </div>
+
+      {/* Feedback Section */}
       <Feedback />
+      
+      {/* Footer Section */}
       <Footer />
     </div>
   );
