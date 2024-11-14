@@ -58,11 +58,8 @@ const Feedback = () => {
     return distribution;
   };
 
-  // Pagination controls
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  const handlePageChange = (newPage) => setCurrentPage(newPage);
 
   const paginatedReviews = reviews.slice(
     (currentPage - 1) * reviewsPerPage,
@@ -70,110 +67,114 @@ const Feedback = () => {
   );
 
   return (
-    <div className="bg-gray-100 p-6 mt-8 rounded shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Customer Feedback</h2>
-
-      {/* Display Average Rating */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">Average Rating</h3>
-        <div className="flex items-center mb-2">
-          <span className="text-xl font-semibold">{averageRating.toFixed(1)}</span>
-          <span className="ml-2 text-yellow-400 flex">
-            {Array.from({ length: 5 }, (_, i) => (
-              <FaStar key={i} className={i < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'} />
-            ))}
-          </span>
+    <div className="flex justify-center items-center bg-gray-100 p-8">
+      <div className="bg-white max-w-3xl w-full p-6 rounded-lg shadow-lg space-y-6">
+        
+        {/* Average Rating Display */}
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Customer Feedback</h2>
+          <div className="flex justify-center items-center space-x-2">
+            <span className="text-3xl font-semibold text-green-600">{averageRating.toFixed(1)}</span>
+            <div className="text-yellow-500 flex">
+              {Array.from({ length: 5 }, (_, i) => (
+                <FaStar key={i} className={i < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'} />
+              ))}
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">Based on {reviews.length} reviews</p>
         </div>
 
         {/* Rating Distribution */}
-        {Object.entries(getRatingDistribution()).map(([star, percentage]) => (
-          <div key={star} className="flex items-center mb-1">
-            <span className="text-sm w-6">{star}⭐</span>
-            <div className="w-full bg-gray-200 rounded h-2 ml-2">
-              <div style={{ width: `${percentage}%` }} className="h-full bg-green-500 rounded"></div>
+        <div className="space-y-2">
+          {Object.entries(getRatingDistribution()).map(([star, percentage]) => (
+            <div key={star} className="flex items-center">
+              <span className="text-sm w-8">{star}⭐</span>
+              <div className="flex-1 bg-gray-200 h-2 rounded-md overflow-hidden">
+                <div style={{ width: `${percentage}%` }} className="h-full bg-green-500"></div>
+              </div>
+              <span className="ml-2 text-xs text-gray-500">{percentage.toFixed(1)}%</span>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Display reviews horizontally with pagination */}
-      <div className="flex overflow-x-auto space-x-4 mb-4">
-        {paginatedReviews.map((rev, index) => (
-          <div key={index} className="bg-white p-4 rounded shadow-md flex-shrink-0 w-72">
-            <div className="flex items-center mb-2">
-              <FaUserCircle className="text-gray-500 text-3xl mr-2" />
-              <p className="font-semibold">{rev.name}</p>
+        {/* Reviews Display with Horizontal Scroll */}
+        <div className="flex overflow-x-auto space-x-4 py-4">
+          {paginatedReviews.map((rev, index) => (
+            <div key={index} className="bg-gray-50 p-4 rounded-lg shadow-md flex-shrink-0 w-72">
+              <div className="flex items-center space-x-2 mb-2">
+                <FaUserCircle className="text-gray-500 text-3xl" />
+                <p className="font-semibold">{rev.name}</p>
+              </div>
+              <div className="flex items-center mb-1">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <FaStar key={i} className={i < rev.rating ? 'text-yellow-400' : 'text-gray-300'} />
+                ))}
+              </div>
+              <p className="text-gray-600">"{rev.review}"</p>
             </div>
-            <div className="flex items-center mb-1">
-              {Array.from({ length: 5 }, (_, i) => (
-                <FaStar key={i} className={i < rev.rating ? 'text-yellow-400' : 'text-gray-300'} />
+          ))}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center space-x-2">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="bg-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-400 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="bg-gray-300 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-400 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+        {/* Feedback Form */}
+        {!showForm && (
+          <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500">
+            Rate Us
+          </button>
+        )}
+
+        {showForm && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2 border rounded-md"
+              required
+            />
+            <textarea
+              placeholder="Your Review"
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              className="w-full p-2 border rounded-md"
+              rows="4"
+              required
+            />
+            <div className="flex items-center space-x-1">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  className={`cursor-pointer ${i < (hover || rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                  onClick={() => setRating(i + 1)}
+                  onMouseEnter={() => setHover(i + 1)}
+                  onMouseLeave={() => setHover(null)}
+                />
               ))}
             </div>
-            <p>"{rev.review}"</p>
-          </div>
-        ))}
+            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-500">
+              Submit Feedback
+            </button>
+          </form>
+        )}
       </div>
-
-      {/* Pagination controls */}
-      <div className="flex justify-center space-x-2 mb-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="bg-gray-200 text-gray-700 px-3 py-1 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="bg-gray-200 text-gray-700 px-3 py-1 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Rate Us Button */}
-      {!showForm && (
-        <button onClick={() => setShowForm(true)} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-          Rate Us
-        </button>
-      )}
-
-      {/* Feedback Form */}
-      {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-          <textarea
-            placeholder="Your Review"
-            value={review}
-            onChange={(e) => setReview(e.target.value)}
-            className="w-full p-2 border rounded"
-            rows="4"
-            required
-          />
-          <div className="flex items-center space-x-1">
-            {[...Array(5)].map((_, i) => (
-              <FaStar
-                key={i}
-                className={`cursor-pointer ${i < (hover || rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                onClick={() => setRating(i + 1)}
-                onMouseEnter={() => setHover(i + 1)}
-                onMouseLeave={() => setHover(null)}
-              />
-            ))}
-          </div>
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-            Submit Feedback
-          </button>
-        </form>
-      )}
     </div>
   );
 };
