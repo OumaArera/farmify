@@ -64,7 +64,8 @@ const Home = () => {
   // Handle Item selection to navigate to item details page
   const handleItemSelect = (item) => {
     setDetailedItem(item);
-    navigate(`/items/${item.id}`);
+    navigate(`/items/${item.id}`, { state: { item } });
+
   };
 
   return (

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
-const ItemDetails = ({ item, onAddToCart, onBuyNow }) => {
-  // Initialize states unconditionally with fallback empty values
-  const [selectedImage, setSelectedImage] = useState(item && item.images ? item.images[0] : '');
+const ItemDetails = ({ onAddToCart, onBuyNow }) => {
+  const location = useLocation();
+  const item = location.state?.item;
+  
+  const [selectedImage, setSelectedImage] = useState(item?.images[0] || '');
   const [quantity, setQuantity] = useState(1);
 
-  // Return early if `item` is not defined
   if (!item) {
     return <div>Loading...</div>;
   }
