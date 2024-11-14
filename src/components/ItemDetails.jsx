@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
-const ItemDetails = ({ onAddToCart, onBuyNow }) => {
+const ItemDetails = ({ onAddToCart }) => {
   const location = useLocation();
-  const navigate = useNavigate();
   const item = location.state?.item;
   
   const [selectedImage, setSelectedImage] = useState(item?.images[0] || '');
@@ -13,14 +12,18 @@ const ItemDetails = ({ onAddToCart, onBuyNow }) => {
     return <div>Loading...</div>;
   }
 
-  const handleBuyNow = () => {
-    navigate('/checkout', { state: { item, quantity } });
-  };
-
   const addToCart = () => {
     onAddToCart(item, quantity);
   };
-  
+
+  // Handle WhatsApp Chat with seller
+  const handleChatWithSeller = () => {
+    const message = `Hello, I'm interested in the following item:\n\n*${item.name}*\nPrice: KES ${item.price}\nDescription: ${item.description}\n\nCan you provide more details?\n\n${selectedImage}`;
+    
+    // Open WhatsApp with the pre-filled message
+    const whatsappUrl = `https://wa.me/${item.sellerNo}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   return (
     <div className="p-4">
@@ -50,8 +53,8 @@ const ItemDetails = ({ onAddToCart, onBuyNow }) => {
       <button onClick={addToCart} className="bg-green-700 text-white px-4 py-2 rounded mt-2">
         Add to Cart
       </button>
-      <button onClick={handleBuyNow} className="bg-blue-600 text-white px-4 py-2 rounded mt-2 ml-2">
-        Buy Now
+      <button onClick={handleChatWithSeller} className="bg-blue-600 text-white px-4 py-2 rounded mt-2 ml-2">
+        Chat with Seller
       </button>
     </div>
   );

@@ -12,8 +12,8 @@ const Home = () => {
   const navigate = useNavigate();
   
   const [items, setItems] = useState([
-    { id: 1, name: 'Tractor Model A', price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
-    { id: 2, name: 'Plow', price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
+    { id: 1, name: 'Tractor Model A',sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
+    { id: 2, name: 'Plow',sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
   ]);
   
   const [cartItems, setCartItems] = useState([]);
@@ -65,6 +65,7 @@ const Home = () => {
   const handleItemSelect = (item) => {
     setDetailedItem(item);
     navigate(`/items/${item.id}`, { state: { item } });
+
   };
 
   return (
@@ -79,7 +80,7 @@ const Home = () => {
             <p className="text-red-500 text-center mt-4">{searchMessage}</p>
           )}
           {detailedItem ? (
-            <ItemDetails item={detailedItem} onAddToCart={addToCart} onBuyNow={(item) => navigate('/checkout', { state: { item } })} />
+            <ItemDetails item={detailedItem} onAddToCart={addToCart} onBuyNow={(item) => <Checkout item={item} />} />
           ) : (
             <ItemList items={filteredItems} onItemSelect={handleItemSelect} />
           )}
