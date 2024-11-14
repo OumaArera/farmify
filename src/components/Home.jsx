@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, useNavigate } from 'react-router-dom';
 import Checkout from './Checkout';
 import ItemList from './ItemList';
 import ItemDetails from './ItemDetails';
@@ -7,16 +7,23 @@ import CategoryFilter from './CategoryFilter';
 import SearchBar from './SearchBar';
 import Feedback from './Feedback';
 import Footer from './Footer';
-
-const ITEMS_PER_PAGE = 2; // Adjust for the number of items per page for each category
+import Offers from './Offers';
 
 const Home = () => {
   const navigate = useNavigate();
-
+  
   const [items, setItems] = useState([
-    { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide' },
-    { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide' },
-    // Add more items with appropriate categories
+    { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide', offerType: '10% Off' },
+    { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide', offerType: 'Buy 1 Get 1 Free' },
+    { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tool A', deliveryType: 'Countrywide', offerType: '10% Off' },
+    { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Tool B', deliveryType: 'Countrywide', offerType: 'Buy 1 Get 1 Free' },
+    { id: 1, name: 'Tractor Model A', sellerNo: "+254748800714", price: 15000, description: 'Reliable tractor for farm work', images: ['/img1.jpg', '/img1_hover.jpg'], category: 'Tool C', deliveryType: 'Countrywide', offerType: '10% Off' },
+    { id: 2, name: 'Plow', sellerNo: "+254748800714", price: 2000, description: 'Durable plow for efficient tilling', images: ['/img2.jpg', '/img2_hover.jpg'], category: 'Tool D', deliveryType: 'Countrywide', offerType: 'Buy 1 Get 1 Free' },
+  ]);
+
+  const [offers, setOffers] = useState([
+    { id: 101, name: 'Christmas Tractor', sellerNo: "+254748800714", price: 13000, description: 'Special offer for Christmas', images: ['/offer1.jpg', '/offer1_hover.jpg'], category: 'Tractors', deliveryType: 'Countrywide', offerType: 'Christmas', offerPeriod: 'Dec 1 - Dec 25', percentageOff: 15 },
+    { id: 102, name: 'New Plow Model', sellerNo: "+254748800714", price: 1800, description: 'New item in the market', images: ['/offer2.jpg', '/offer2_hover.jpg'], category: 'Equipment', deliveryType: 'Countrywide', offerType: 'New', offerPeriod: 'Jan 1 - Jan 15', percentageOff: 10 },
   ]);
 
   const [cartItems, setCartItems] = useState([]);
@@ -24,33 +31,39 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [detailedItem, setDetailedItem] = useState(null);
   const [searchMessage, setSearchMessage] = useState('');
-  const [page, setPage] = useState({}); // Keep track of current page for each category
 
-  // Group items by category for display and pagination
-  const itemsByCategory = items.reduce((acc, item) => {
-    if (!acc[item.category]) acc[item.category] = [];
-    acc[item.category].push(item);
-    return acc;
-  }, {});
+  const allCategories = [...new Set(items.map(item => item.category).concat(offers.map(offer => offer.category)))];
 
-  // Handle pagination and filtering
-  const paginatedItems = (category) => {
-    const categoryItems = itemsByCategory[category] || [];
-    const currentPage = page[category] || 1;
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return categoryItems.slice(start, start + ITEMS_PER_PAGE);
-  };
+  // Enhanced search function with relevance-based scoring
+  const filteredItems = items
+    .map((item) => {
+      const lowerName = item.name.toLowerCase();
+      const lowerCategory = item.category.toLowerCase();
+      const lowerQuery = searchQuery.toLowerCase();
 
+      let score = 0;
+      if (lowerName === lowerQuery || lowerCategory === lowerQuery) score += 3; // Exact match
+      else if (lowerName.includes(lowerQuery) || lowerCategory.includes(lowerQuery)) score += 2; // Partial match
+      return { ...item, score };
+    })
+    .filter((item) => (selectedCategory ? item.category === selectedCategory : true) && item.score > 0) // Filter by category and positive score
+    .sort((a, b) => b.score - a.score); // Sort by relevance
+
+  // Handle Search
   const handleSearch = (query) => {
     setSearchQuery(query);
-    // Update search results or display message if no results found
+
+    // Display message if no results match
     if (query && filteredItems.length === 0) {
-      setSearchMessage('No items found matching your search. Try browsing the categories.');
+      setSearchMessage(
+        'No items found matching your search. Try browsing the categories in the sidebar.'
+      );
     } else {
       setSearchMessage('');
     }
   };
 
+  // Add to Cart with backend POST request
   const addToCart = (item, quantity) => {
     setCartItems([...cartItems, { ...item, quantity }]);
     fetch('/api/cart', {
@@ -60,76 +73,43 @@ const Home = () => {
     });
   };
 
+  // Handle Item selection to navigate to item details page
   const handleItemSelect = (item) => {
     setDetailedItem(item);
     navigate(`/items/${item.id}`, { state: { item } });
   };
 
-  // Pagination controls
-  const handlePageChange = (category, newPage) => {
-    setPage((prev) => ({ ...prev, [category]: newPage }));
-  };
+  // Group items by category
+  const groupedItems = filteredItems.reduce((acc, item) => {
+    if (!acc[item.category]) acc[item.category] = [];
+    acc[item.category].push(item);
+    return acc;
+  }, {});
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto p-4 flex flex-col md:flex-row">
-        {/* Sidebar: Category Filter and Items on Offer */}
-        <aside className="w-full md:w-1/4 mb-4 md:mb-0 md:pr-4">
-          <CategoryFilter categories={Object.keys(itemsByCategory)} setSelectedCategory={setSelectedCategory} />
-          
-          {/* Offers Section */}
-          <div className="bg-white shadow-md rounded-lg mt-4 p-4">
-            <h2 className="text-xl font-semibold mb-2">Items on Offer</h2>
-            {items.map((item) => (
-              <div key={item.id} className="flex justify-between items-center p-2 border-b">
-                <div>
-                  <span className="text-lg font-medium">{item.name}</span>
-                  <div className="text-sm text-gray-600">{item.category}</div>
-                </div>
-                <div className="text-right">
-                  <span className="text-red-500 font-semibold">20% Off</span>
-                  <div className="text-xs text-gray-500">Black Friday Sale</div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="container mx-auto p-4 flex">
+        <aside className="w-1/4 pr-4">
+        <CategoryFilter categories={allCategories} setSelectedCategory={setSelectedCategory} />
+        <Offers offers={offers} onOfferSelect={handleItemSelect} />
         </aside>
-
-        {/* Main Content Area: Category Display */}
-        <main className="w-full md:w-3/4 md:pl-4 flex flex-col">
+        <main className="w-3/4">
           <SearchBar onSearch={handleSearch} />
-          {searchMessage && <p className="text-red-500 text-center mt-4">{searchMessage}</p>}
-          
-          {/* Display items by category with pagination */}
-          {Object.keys(itemsByCategory).map((category) => (
-            <div key={category} className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">{category}</h2>
-              <ItemList items={paginatedItems(category)} onItemSelect={handleItemSelect} />
-
-              {/* Pagination controls */}
-              <div className="flex justify-center mt-4">
-                <button
-                  onClick={() => handlePageChange(category, (page[category] || 1) - 1)}
-                  disabled={(page[category] || 1) <= 1}
-                  className="px-3 py-1 border rounded-l-lg"
-                >
-                  Prev
-                </button>
-                <span className="px-3 py-1 border-t border-b">{page[category] || 1}</span>
-                <button
-                  onClick={() => handlePageChange(category, (page[category] || 1) + 1)}
-                  disabled={paginatedItems(category).length < ITEMS_PER_PAGE}
-                  className="px-3 py-1 border rounded-r-lg"
-                >
-                  Next
-                </button>
+          {searchMessage && (
+            <p className="text-red-500 text-center mt-4">{searchMessage}</p>
+          )}
+          {detailedItem ? (
+            <ItemDetails item={detailedItem} onAddToCart={addToCart} onBuyNow={(item) => <Checkout item={item} />} />
+          ) : (
+            Object.entries(groupedItems).map(([category, items]) => (
+              <div key={category}>
+                <h2 className="text-2xl font-bold mt-6">{category}</h2>
+                <ItemList items={items} onItemSelect={handleItemSelect} />
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </main>
       </div>
-
-      {/* Feedback and Footer */}
       <Feedback />
       <Footer />
     </div>
