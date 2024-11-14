@@ -4,7 +4,7 @@ import { FaSearch } from 'react-icons/fa';
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
-  const handleSearch = () => onSearch(query);
+  const handleSearch = () => onSearch(query.trim());
 
   return (
     <div className="flex items-center bg-white p-2 rounded shadow-md">

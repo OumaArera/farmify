@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
 import Checkout from './Checkout';
 import ItemList from './ItemList';
 import ItemDetails from './ItemDetails';
@@ -21,12 +20,36 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [detailedItem, setDetailedItem] = useState(null);
+  const [searchMessage, setSearchMessage] = useState('');
 
-  // Filter items by category and search
-  const filteredItems = items.filter((item) =>
-    (selectedCategory ? item.category === selectedCategory : true) &&
-    (searchQuery ? item.name.toLowerCase().includes(searchQuery.toLowerCase()) : true)
-  );
+  // Enhanced search function with relevance-based scoring
+  const filteredItems = items
+    .map((item) => {
+      const lowerName = item.name.toLowerCase();
+      const lowerCategory = item.category.toLowerCase();
+      const lowerQuery = searchQuery.toLowerCase();
+
+      let score = 0;
+      if (lowerName === lowerQuery || lowerCategory === lowerQuery) score += 3; // Exact match
+      else if (lowerName.includes(lowerQuery) || lowerCategory.includes(lowerQuery)) score += 2; // Partial match
+      return { ...item, score };
+    })
+    .filter((item) => (selectedCategory ? item.category === selectedCategory : true) && item.score > 0) // Filter by category and positive score
+    .sort((a, b) => b.score - a.score); // Sort by relevance
+
+  // Handle Search
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    // Display message if no results match
+    if (query && filteredItems.length === 0) {
+      setSearchMessage(
+        'No items found matching your search. Try browsing the categories in the sidebar.'
+      );
+    } else {
+      setSearchMessage('');
+    }
+  };
 
   // Add to Cart with backend POST request
   const addToCart = (item, quantity) => {
@@ -51,7 +74,10 @@ const Home = () => {
           <CategoryFilter categories={['Tractors', 'Equipment']} setSelectedCategory={setSelectedCategory} />
         </aside>
         <main className="w-3/4">
-          <SearchBar onSearch={(query) => setSearchQuery(query)} />
+          <SearchBar onSearch={handleSearch} />
+          {searchMessage && (
+            <p className="text-red-500 text-center mt-4">{searchMessage}</p>
+          )}
           {detailedItem ? (
             <ItemDetails item={detailedItem} onAddToCart={addToCart} onBuyNow={(item) => <Checkout item={item} />} />
           ) : (
