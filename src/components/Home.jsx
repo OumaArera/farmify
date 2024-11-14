@@ -65,7 +65,6 @@ const Home = () => {
   const handleItemSelect = (item) => {
     setDetailedItem(item);
     navigate(`/items/${item.id}`, { state: { item } });
-
   };
 
   return (
@@ -80,7 +79,7 @@ const Home = () => {
             <p className="text-red-500 text-center mt-4">{searchMessage}</p>
           )}
           {detailedItem ? (
-            <ItemDetails item={detailedItem} onAddToCart={addToCart} onBuyNow={(item) => <Checkout item={item} />} />
+            <ItemDetails item={detailedItem} onAddToCart={addToCart} onBuyNow={(item) => navigate('/checkout', { state: { item } })} />
           ) : (
             <ItemList items={filteredItems} onItemSelect={handleItemSelect} />
           )}
